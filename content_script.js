@@ -1,4 +1,5 @@
 window.onload = () => {
+  console.log(`Content script loading`);
   if (window.recorderInjected) return
   Object.defineProperty(window, 'recorderInjected', { value: true, writable: false })
 
@@ -14,6 +15,7 @@ window.onload = () => {
       port.postMessage({ type: 'REC_STOP' }, '*')
     }
     if(event.data.downloadComplete){
+      console.log('download complete')
       document.querySelector('html').classList.add('downloadComplete')
     }
   })

@@ -6,13 +6,13 @@
     "example": "node export.js http://tobiasahlin.com/spinkit/ spinner.webm"
   },
   "keywords": [
-    "record",
-    "chrome",
-    "puppeteer",
-    "screencast"
+    "record"
   ],
   "dependencies": {
+    "express": "^4.16.4",
     "puppeteer": "1.6.0",
+    "serve-index": "^1.9.1",
+    "uuid": "^3.3.2",
     "xvfb": "^0.2.3"
   }
 }

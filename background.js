@@ -1,5 +1,6 @@
 /* global chrome, MediaRecorder, FileReader */
 
+console.log(`Background script loading`);
 let recorder = null;
 let filename = null;
 chrome.runtime.onConnect.addListener(port => {
@@ -8,9 +9,11 @@ chrome.runtime.onConnect.addListener(port => {
     console.log(msg);
     switch (msg.type) {
       case 'SET_EXPORT_PATH':
+        console.log(`set export path`);
         filename = msg.filename
         break
       case 'REC_STOP':
+        console.log(`REC STOP`);
         recorder.stop()    
         break
       case 'REC_CLIENT_PLAY':
@@ -64,6 +67,7 @@ chrome.runtime.onConnect.addListener(port => {
                 url: url,
                 filename: filename
               }, ()=>{
+                console.log(arguments);
               });
             }
 

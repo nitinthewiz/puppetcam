@@ -1,0 +1,9 @@
+node_modules
+videos
+package-lock.json
+
+.git
+Dockerfile
+.DS_Store
+.gitignore
+README.md
