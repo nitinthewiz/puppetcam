@@ -1,18 +1,19 @@
 {
-  "name": "puppetcam",
+  "name": "Record any URL to mp4",
   "version": "0.0.1",
-  "description": "Capture all automated actions in a browser and export as a video",
-  "scripts": {
-    "example": "node export.js http://tobiasahlin.com/spinkit/ spinner.webm"
-  },
+  "description": "RecordExport any website URL in mp4 format",
+  "scripts": {},
   "keywords": [
     "record"
   ],
   "dependencies": {
     "express": "^4.16.4",
     "puppeteer": "1.6.0",
-    "serve-index": "^1.9.1",
     "uuid": "^3.3.2",
     "xvfb": "^0.2.3"
+  },
+  "devDependencies": {
+    "eslint": "^5.15.2",
+    "prettier": "1.16.4"
   }
 }

@@ -9,7 +9,6 @@ readonly G_LOG_E='[ERROR]'
 main() {
     launch_xvfb
     launch_window_manager
-    # run_vnc_server
 }
 
 launch_xvfb() {
@@ -50,27 +49,6 @@ launch_window_manager() {
             exit 1
         fi
     done
-}
-
-run_vnc_server() {
-    local passwordArgument='-nopw'
-
-    if [ -n "${VNC_SERVER_PASSWORD}" ]
-    then
-        local passwordFilePath="${HOME}/x11vnc.pass"
-        if ! x11vnc -storepasswd "${VNC_SERVER_PASSWORD}" "${passwordFilePath}"
-        then
-            echo "${G_LOG_E} Failed to store x11vnc password."
-            exit 1
-        fi
-        passwordArgument=-"-rfbauth ${passwordFilePath}"
-        echo "${G_LOG_I} The VNC server will ask for a password."
-    else
-        echo "${G_LOG_W} The VNC server will NOT ask for a password."
-    fi
-
-    x11vnc -display ${DISPLAY} -forever ${passwordArgument} &
-    wait $!
 }
 
 control_c() {
