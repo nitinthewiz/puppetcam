@@ -9,7 +9,11 @@
 - Based on Ubuntu bionic
 
 To build image use: `docker build -t rad-video-recorder:0.0.1 .`
-To run image use: `docker run -p 3000:3000 rad-video-recorder:0.0.1`
+
+# set aws credentials
+`AWS_ACCESS_KEY_ID=$(aws --profile default configure get aws_access_key_id)`
+`AWS_SECRET_ACCESS_KEY=$(aws --profile default configure get aws_secret_access_key)`
+To run image use: `docker run -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY --rm -p 3000:3000 rad-video-recorder:0.0.1`
 
 If you want to expose `export.js` to local file you can use:
 `docker run -v $(pwd)/export.js:/app/export.js -p 3000:3000 rad-video-recorder:0.0.1`

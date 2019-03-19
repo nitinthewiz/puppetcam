@@ -1,5 +1,5 @@
 {
-  "name": "Record any URL to mp4",
+  "name": "url-recorder",
   "version": "0.0.1",
   "description": "RecordExport any website URL in mp4 format",
   "scripts": {},
@@ -7,6 +7,7 @@
     "record"
   ],
   "dependencies": {
+    "aws-sdk": "^2.423.0",
     "express": "^4.16.4",
     "puppeteer": "1.6.0",
     "uuid": "^3.3.2",

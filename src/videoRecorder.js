@@ -57,6 +57,8 @@ async function record(url, time) {
     outputVideo: `./videos/${fileName}.mp4`,
   });
   xvfb.stopSync();
+
+  //this should return video path, because /videos/ is first defined here. Or path should be parameter to this function
   return fileName;
 }
 

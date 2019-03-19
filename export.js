@@ -1,6 +1,8 @@
 const express = require('express');
 const fs = require('fs');
 const videoRecorder = require('./src/videoRecorder.js');
+const awsCommands = require('./src/awsCommands.js');
+
 
 const app = express();
 const port = 3000;
@@ -14,14 +16,25 @@ app.get('/process', async (req, res, next) => {
   }
   try {
     const videoName = await videoRecorder.record(url, time);
-    res.redirect(`video/${videoName}`);
+    const data = await awsCommands.uploadFile({filePath:`videos/${videoName}.mp4`});
+    // res.redirect(`saved/${videoName}`);
+    res.send(`<html><body><video controls width="1280" height="720"><source src="${data.Location}" type="video/mp4"></video></body></html>`);
+
+    // res.json(data);
   } catch (e) {
     //this will eventually be handled by error handling middleware
     next(e);
   }
 });
 
-app.get('/video/:name', function(req, res) {
+
+app.get('/saved/:name', function (req, res) {
+  const videoName = req.params.name;
+  const videoUrl = `https://s3-eu-west-1.amazonaws.com/url-video/${videoName}.mp4`;
+  res.send(`<html><body><video controls width="1280" height="720"><source src="${videoUrl}" type="video/mp4"></video></body></html>`);
+});
+
+app.get('/stream/:name', function(req, res) {
   const videoName = req.params.name;
   const path = `videos/${videoName}.mp4`;
   const stat = fs.statSync(path);
