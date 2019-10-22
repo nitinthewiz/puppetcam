@@ -7,6 +7,7 @@ module.exports = {
 function process({ inputVideo, outputVideo }) {
     let ffmpegArguments = [
         '-i', `${inputVideo}`,
+        '-crf', '1', // https://blog.addpipe.com/converting-webm-to-mp4-with-ffmpeg/
         `${outputVideo}`,
         '-y', //Overwrite output files without asking
     ];
