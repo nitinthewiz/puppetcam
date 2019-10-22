@@ -27,7 +27,7 @@ window.onload = () => {
   window.postMessage(
     {
       type: 'REC_CLIENT_PLAY',
-      data: {url: window.location.origin, size: {width: 1280, height: 720}},
+      data: {url: window.location.origin, size: {width: 1920, height: 1080}},
     },
     '*',
   );

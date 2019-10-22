@@ -17,7 +17,7 @@ const options = {
     '--load-extension=' + chromeExtensionPath,
     '--disable-extensions-except=' + chromeExtensionPath,
     '--disable-infobars',
-    `--window-size=${1280},${720}`,
+    `--window-size=${1920},${1080}`,
     `--no-sandbox`,
   ],
 };
@@ -42,6 +42,8 @@ async function record(url, time) {
 
   // Perform any actions that have to be captured in the exported video
   await page.waitFor(parseInt(time, 10));
+  console.log("Waited for - ");
+  console.log(parseInt(time, 10));
 
   await page.evaluate(filename => {
     window.postMessage({type: 'SET_EXPORT_PATH', filename: filename}, '*');

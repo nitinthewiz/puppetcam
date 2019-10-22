@@ -21,7 +21,7 @@ chrome.runtime.onConnect.addListener(port => {
         }
         const tab = port.sender.tab;
         tab.url = msg.data.url;
-        const size = msg.data.size || {width: 1200, height: 720};
+        const size = msg.data.size || {width: 1920, height: 1080};
         chrome.desktopCapture.chooseDesktopMedia(['tab', 'audio'], streamId => {
           // Get the stream
           navigator.webkitGetUserMedia(
