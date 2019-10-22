@@ -41,7 +41,7 @@ async function record(url, time) {
   await page.setBypassCSP(true);
 
   // Perform any actions that have to be captured in the exported video
-  await page.waitFor(time);
+  await page.waitFor(parseInt(time, 10));
 
   await page.evaluate(filename => {
     window.postMessage({type: 'SET_EXPORT_PATH', filename: filename}, '*');

@@ -33,6 +33,18 @@ It streams the video directly to client from `/video` folder.
 
 
 
+To sync files outside (and enable API and to poke around inside) - 
+`docker run -it -v ~/temp/puppetcam_docker:/app/videos -p 3000:3000 rad-video-recorder:0.0.1 /bin/bash`
+
+Note that the URL should be encoded for the best result. 
+
+So this will not work - 
+`http://localhost:3000/process?time=10000&url=https://tungs.github.io/truchet-tiles-original/#autoplay=true&switchStyle=random`
+
+But this will -
+`http://localhost:3000/process?time=10000&url=https%3A%2F%2Ftungs.github.io%2Ftruchet-tiles-original%2F%23autoplay%3Dtrue%26switchStyle%3Drandom`
+
+
 TODO:
 
 process parameters

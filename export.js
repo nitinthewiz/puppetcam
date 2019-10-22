@@ -16,9 +16,9 @@ app.get('/process', async (req, res, next) => {
   }
   try {
     const videoName = await videoRecorder.record(url, time);
-    const data = await awsCommands.uploadFile({filePath:`videos/${videoName}.mp4`});
-    // res.redirect(`saved/${videoName}`);
-    res.send(`<html><body><video controls width="1280" height="720"><source src="${data.Location}" type="video/mp4"></video></body></html>`);
+    // const data = await awsCommands.uploadFile({filePath:`videos/${videoName}.mp4`});
+    res.redirect(`stream/${videoName}`);
+    // res.send(`<html><body><video controls width="1280" height="720"><source src="${data.Location}" type="video/mp4"></video></body></html>`);
 
     // res.json(data);
   } catch (e) {
