@@ -12,6 +12,8 @@
   }],
   "permissions": [
     "desktopCapture",
+    "tabCapture",
+    "tabs",
     "<all_urls>",
     "downloads"
   ]
