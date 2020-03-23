@@ -3,7 +3,6 @@
 let recorder = null;
 let filename = null;
 chrome.runtime.onConnect.addListener(port => {
-
   port.onMessage.addListener(msg => {
     console.log(msg);
     switch (msg.type) {
@@ -27,17 +26,17 @@ chrome.runtime.onConnect.addListener(port => {
               mandatory: {
                 chromeMediaSource: 'desktop',
                 chromeMediaSourceId: streamId,
-                minWidth: 1280,
-                maxWidth: 1280,
-                minHeight: 720,
-                maxHeight: 720,
+                minWidth: 1920,
+                maxWidth: 1920,
+                minHeight: 1080,
+                maxHeight: 1080,
                 minFrameRate: 60,
               }
             }
           }, stream => {
             var chunks=[];
             recorder = new MediaRecorder(stream, {
-                videoBitsPerSecond: 2500000,
+                videoBitsPerSecond: 3000000,
                 ignoreMutedMedia: true,
                 mimeType: 'video/webm'
             });

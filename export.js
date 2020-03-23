@@ -1,8 +1,8 @@
 const puppeteer = require('puppeteer');
 const Xvfb      = require('xvfb');
 var xvfb        = new Xvfb({silent: true});
-var width       = 1280;
-var height      = 720;
+var width       = 1920;
+var height      = 1080;
 var options     = {
   headless: false,
   args: [
@@ -17,10 +17,13 @@ var options     = {
 }
 
 async function main() {
+    var url = process.argv[2]
+    var exportname = process.argv[3]
+    var length = process.argv[4] ? parseInt(process.argv[4]) : 5000 
+    
     xvfb.startSync()
-    var url = process.argv[2], exportname = process.argv[3]
-    if(!url){ url = 'http://tobiasahlin.com/spinkit/' }
-    if(!exportname){ exportname = 'spinner.webm' }
+
+    console.log('Launching browser')
     const browser = await puppeteer.launch(options)
     const pages = await browser.pages()
     const page = pages[0]
@@ -29,16 +32,21 @@ async function main() {
     await page.setBypassCSP(true)
 
     // Perform any actions that have to be captured in the exported video
-    await page.waitFor(8000)
+    console.log('Waiting for ' + length + 'ms')
+    await page.waitFor(length)
 
+    console.log('Sending commands')
     await page.evaluate(filename=>{
         window.postMessage({type: 'SET_EXPORT_PATH', filename: filename}, '*')
         window.postMessage({type: 'REC_STOP'}, '*')
     }, exportname)
 
     // Wait for download of webm to complete
+    console.log('Wait for download complete')
     await page.waitForSelector('html.downloadComplete', {timeout: 0})
+    console.log('Closing browser')
     await browser.close()
+
     xvfb.stopSync()
 }
 
