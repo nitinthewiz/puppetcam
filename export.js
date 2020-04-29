@@ -23,7 +23,12 @@ var options = {
     '--disable-extensions-except=' + __dirname,
     '--disable-infobars',
     `--window-size=${width},${height}`,
+    '--no-sandbox',
+    '--disable-setuid-sandbox',
+    '--disable-gpu',
   ],
+  ignoreHTTPSErrors: true,
+  dumpio: false, /* change to true for chrome debugging */
 }
 
 async function main() {
