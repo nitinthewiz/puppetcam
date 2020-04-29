@@ -1,9 +1,19 @@
 const puppeteer = require('puppeteer');
-const Xvfb      = require('xvfb');
-var xvfb        = new Xvfb({silent: true});
-var width       = 1920;
-var height      = 1080;
-var options     = {
+const Xvfb = require('xvfb');
+
+var width = 1920;
+var height = 1080;
+
+var xvfb = new Xvfb({
+  silent: true,
+  xvfb_args: [
+    '-ac',
+    '-nolisten', 'tcp',
+    '-screen', '0', `${width}x${height}x24`,
+  ],
+});
+
+var options = {
   headless: false,
   args: [
     '--enable-usermedia-screen-capturing',
@@ -19,8 +29,8 @@ var options     = {
 async function main() {
     var url = process.argv[2]
     var exportname = process.argv[3]
-    var length = process.argv[4] ? parseInt(process.argv[4]) : 5000 
-    
+    var length = process.argv[4] ? parseInt(process.argv[4]) : 5000
+
     xvfb.startSync()
 
     console.log('Launching browser')
@@ -35,6 +45,7 @@ async function main() {
     console.log('Waiting for ' + length + 'ms')
     await page.waitFor(length)
 
+    // Save and download video
     console.log('Sending commands')
     await page.evaluate(filename=>{
         window.postMessage({type: 'SET_EXPORT_PATH', filename: filename}, '*')
@@ -51,4 +62,3 @@ async function main() {
 }
 
 main()
-
