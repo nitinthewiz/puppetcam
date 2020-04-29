@@ -12,6 +12,13 @@ Example to export chrome tab as a video
 1. xvfb
 2. npm modules listed in package.json
 
+### Docker
+
+```sh
+docker build -t puppetcam:standalone .
+docker run -v "${PWD}/data:/home/user/Downloads" puppetcam:standalone http://tobiasahlin.com/spinkit/ spinner.webm
+```
+
 ### Usage
 
 ```sh
