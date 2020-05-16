@@ -4,7 +4,11 @@ COPY ./package*.json /home/node/app/
 WORKDIR /home/node/app
 RUN npm install
 
-COPY ./export.js ./run.sh /home/node/app/
+COPY ./export.js ./run.sh ./.manifest.json.key /home/node/app/
+COPY ./chrome-extensions/screen-recording /home/node/app/recorder-extension
+RUN tail -n +2 ./recorder-extension/manifest.json >> .manifest.json.key \
+    && mv .manifest.json.key ./recorder-extension/manifest.json
+
 # Build the image from the slim version
 FROM node:lts-slim
 USER root
