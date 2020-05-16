@@ -1,7 +1,7 @@
 # Install in complete environment
 FROM node:lts as npm_install
-COPY ./ /home/user/app
-WORKDIR /home/user/app
+COPY ./ /home/node/app
+WORKDIR /home/node/app
 RUN npm install
 
 # Build the image from the slim version
@@ -19,12 +19,10 @@ RUN apt-get update \
         lsb-release xdg-utils wget gosu \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN groupadd -g 2000 user \
-    && useradd -u 2000 -g user -G audio,video user \
-    && mkdir -p /home/user/Downloads \
-    && chown -R user:user /home/user/Downloads
+RUN mkdir -p /home/node/Downloads \
+    && chown -R node:node /home/node/Downloads
 
-COPY --from=npm_install --chown=user:user /home/user/app /home/user/app
+COPY --from=npm_install --chown=node:node /home/node/app /home/node/app
 
-WORKDIR /home/user/app
-ENTRYPOINT ["/home/user/app/run.sh"]
+WORKDIR /home/node/app
+ENTRYPOINT ["/home/node/app/run.sh"]

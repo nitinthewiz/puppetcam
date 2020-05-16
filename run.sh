@@ -1,3 +1,3 @@
 #!/bin/bash
-chown user:user /home/user/Downloads
-exec gosu user:user node export.js "$@"
+chown node:node /home/node/Downloads
+exec gosu node:node node export.js "$@"
