@@ -1,9 +1,10 @@
 # Install in complete environment
 FROM node:lts as npm_install
-COPY ./ /home/node/app
+COPY ./package*.json /home/node/app/
 WORKDIR /home/node/app
 RUN npm install
 
+COPY ./export.js ./run.sh /home/node/app/
 # Build the image from the slim version
 FROM node:lts-slim
 USER root
