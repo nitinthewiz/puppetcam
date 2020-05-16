@@ -1,3 +1,4 @@
+const fs = require('fs');
 const puppeteer = require('puppeteer');
 const Xvfb = require('xvfb');
 
@@ -18,14 +19,16 @@ var options = {
   args: [
     '--enable-usermedia-screen-capturing',
     '--allow-http-screen-capture',
-    '--auto-select-desktop-capture-source=puppetcam',
-    '--load-extension=' + __dirname,
-    '--disable-extensions-except=' + __dirname,
+    '--whitelisted-extension-id=gbjeleomdpcpilffmhipafohhegdcjdj',
+    '--load-extension=' + __dirname + '/recorder-extension',
+    '--disable-extensions-except=' + __dirname + '/recorder-extension',
+    '--start-fullscreen',
     '--disable-infobars',
     `--window-size=${width},${height}`,
     '--no-sandbox',
     '--disable-setuid-sandbox',
     '--disable-gpu',
+    '--no-default-browser-check',
   ],
   ignoreHTTPSErrors: true,
   dumpio: false, /* change to true for chrome debugging */
@@ -36,34 +39,57 @@ async function main() {
     var exportname = process.argv[3]
     var length = process.argv[4] ? parseInt(process.argv[4]) : 5000
 
-    xvfb.startSync()
-
     console.log('Launching browser')
+    xvfb.startSync()
     const browser = await puppeteer.launch(options)
     const pages = await browser.pages()
     const page = pages[0]
-    await page._client.send('Emulation.clearDeviceMetricsOverride')
-    await page.goto(url, {waitUntil: 'networkidle2'})
-    await page.setBypassCSP(true)
 
-    // Perform any actions that have to be captured in the exported video
-    console.log('Waiting for ' + length + 'ms')
-    await page.waitFor(length)
+    const video_data = await new Promise(async (resolve) => {
+      await page._client.send('Emulation.clearDeviceMetricsOverride')
+      await page.goto(url, {waitUntil: 'networkidle2'})
 
-    // Save and download video
-    console.log('Sending commands')
-    await page.evaluate(filename=>{
-        window.postMessage({type: 'SET_EXPORT_PATH', filename: filename}, '*')
-        window.postMessage({type: 'REC_STOP'}, '*')
-    }, exportname)
+      await page.exposeFunction('onMessageReceivedEvent', e => {
+        if (!e.data.messageFromContentScript1234) {
+          return;
+        }
 
-    // Wait for download of webm to complete
-    console.log('Wait for download complete')
-    await page.waitForSelector('html.downloadComplete', {timeout: 0})
+        if (e.data.startedRecording == true) {
+          console.log('Recording started, it will take', length/1000, 'seconds')
+          page.evaluate(time_ms => {
+            setTimeout(() => window.recorder.stopRecording(), time_ms);
+          }, length);
+        }
+
+        if (e.data.stoppedRecording == true) {
+          console.log('Recording finished')
+          resolve(e.data.file)
+        }
+      });
+
+      await page.evaluate(type => {
+        window.addEventListener(type, e => {
+          window.onMessageReceivedEvent({type, data: e.data});
+        });
+      }, "message");
+
+      console.log('Starting recording...')
+      await page.evaluate(() => {
+          window.recorder = new RecordRTC_Extension();
+          window.recorder.startRecording({enableTabCaptureAPI: true});
+      });
+    })
+
     console.log('Closing browser')
     await browser.close()
-
     xvfb.stopSync()
+
+    fs.writeFile(
+      `${process.env.HOME}/Downloads/${exportname}`,
+      video_data.replace(/^data:(.*?);base64,/, "").replace(/ /g, '+'),
+      'base64',
+      err => { if (err) console.log(err);},
+    );
 }
 
 main()
