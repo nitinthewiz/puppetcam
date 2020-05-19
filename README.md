@@ -16,7 +16,7 @@ Example to export chrome tab as a video
 
 ```sh
 docker build -t puppetcam:standalone .
-docker run -v "${PWD}/data:/home/user/Downloads" puppetcam:standalone http://tobiasahlin.com/spinkit/ spinner.webm
+docker run -v "${PWD}/data:/home/node/Downloads" puppetcam:standalone http://tobiasahlin.com/spinkit/ spinner.webm
 ```
 
 ### Usage
