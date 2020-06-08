@@ -2,42 +2,49 @@ const fs = require('fs');
 const puppeteer = require('puppeteer');
 const Xvfb = require('xvfb');
 
-var width = 1920 + 1;
-var height = 1080 + 1 + 44;
-
-var xvfb = new Xvfb({
-  silent: true,
-  xvfb_args: [
-    '-ac',
-    '-nolisten', 'tcp',
-    '-screen', '0', `${width}x${height}x24`,
-  ],
-});
-
-var options = {
-  headless: false,
-  args: [
-    '--enable-usermedia-screen-capturing',
-    '--allow-http-screen-capture',
-    '--whitelisted-extension-id=gbjeleomdpcpilffmhipafohhegdcjdj',
-    '--load-extension=' + __dirname + '/recorder-extension',
-    '--disable-extensions-except=' + __dirname + '/recorder-extension',
-    '--start-fullscreen',
-    '--disable-infobars',
-    `--window-size=${width},${height}`,
-    '--no-sandbox',
-    '--disable-setuid-sandbox',
-    '--disable-gpu',
-    '--no-default-browser-check',
-  ],
-  ignoreHTTPSErrors: true,
-  dumpio: false, /* change to true for chrome debugging */
-}
+var xvfb = null;
 
 async function main() {
     var url = process.argv[2]
     var exportname = process.argv[3]
     var length = process.argv[4] ? parseInt(process.argv[4]) : 5000
+    var width = (process.argv[5] ? parseInt(process.argv[5]) : 1920) + 1
+    var height = (process.argv[6] ? parseInt(process.argv[6]) : 1080) + 1 + 44
+
+    console.log('url: ' + url)
+    console.log('exportName: ' + exportname)
+    console.log('length: ' + length)
+    console.log('width: ' + width)
+    console.log('height: ' + height)
+
+    xvfb = new Xvfb({
+      silent: true,
+      xvfb_args: [
+        '-ac',
+        '-nolisten', 'tcp',
+        '-screen', '0', `${width}x${height}x24`,
+      ],
+    });
+
+    var options = {
+      headless: false,
+      args: [
+        '--enable-usermedia-screen-capturing',
+        '--allow-http-screen-capture',
+        '--whitelisted-extension-id=gbjeleomdpcpilffmhipafohhegdcjdj',
+        '--load-extension=' + __dirname + '/recorder-extension',
+        '--disable-extensions-except=' + __dirname + '/recorder-extension',
+        '--start-fullscreen',
+        '--disable-infobars',
+        `--window-size=${width},${height}`,
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-gpu',
+        '--no-default-browser-check',
+      ],
+      ignoreHTTPSErrors: true,
+      dumpio: false, /* change to true for chrome debugging */
+    }
 
     console.log('Launching browser')
     xvfb.startSync()
