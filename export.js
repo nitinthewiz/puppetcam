@@ -8,21 +8,23 @@ async function main() {
     var url = process.argv[2]
     var exportname = process.argv[3]
     var length = process.argv[4] ? parseInt(process.argv[4]) : 5000
-    var width = (process.argv[5] ? parseInt(process.argv[5]) : 1920) + 1
-    var height = (process.argv[6] ? parseInt(process.argv[6]) : 1080) + 1 + 44
+    var width = process.argv[5] ? parseInt(process.argv[5]) : 1920
+    var height = process.argv[6] ? parseInt(process.argv[6]) : 1080
+    var width_screen = width + 1
+    var height_screen = height + 1 + 44
 
     console.log('url: ' + url)
     console.log('exportName: ' + exportname)
-    console.log('length: ' + length)
-    console.log('width: ' + width)
-    console.log('height: ' + height)
+    console.log('length: ' + length + ' ms')
+    console.log('screen resolution: ' + width_screen + 'x' + height_screen)
+    console.log('video resolution: ' + width + 'x' + height)
 
     xvfb = new Xvfb({
       silent: true,
       xvfb_args: [
         '-ac',
         '-nolisten', 'tcp',
-        '-screen', '0', `${width}x${height}x24`,
+        '-screen', '0', `${width_screen}x${height_screen}x24`,
       ],
     });
 
@@ -36,7 +38,7 @@ async function main() {
         '--disable-extensions-except=' + __dirname + '/recorder-extension',
         '--start-fullscreen',
         '--disable-infobars',
-        `--window-size=${width},${height}`,
+        `--window-size=${width_screen},${height_screen}`,
         '--no-sandbox',
         '--disable-setuid-sandbox',
         '--disable-gpu',
@@ -83,10 +85,14 @@ async function main() {
       }, "message");
 
       console.log('Starting recording...')
-      await page.evaluate(() => {
+      await page.evaluate((width, height) => {
           window.recorder = new RecordRTC_Extension();
-          window.recorder.startRecording({enableTabCaptureAPI: true});
-      });
+          window.recorder.startRecording({
+            enableTabCaptureAPI: true,
+            width: width,
+            height: height,
+          });
+      }, width, height);
     })
 
     console.log('Closing browser')
