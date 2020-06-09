@@ -89,6 +89,7 @@ async function main() {
           window.recorder = new RecordRTC_Extension();
           window.recorder.startRecording({
             enableTabCaptureAPI: true,
+            fixVideoSeekingIssues: true,
             width: width,
             height: height,
           });
