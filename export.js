@@ -51,6 +51,7 @@ async function main() {
     const browser = await puppeteer.launch(options)
     const pages = await browser.pages()
     const page = pages[0]
+    let record_start
 
     const video_data = await new Promise(async (resolve) => {
       await page._client.send('Emulation.clearDeviceMetricsOverride')
@@ -63,13 +64,14 @@ async function main() {
 
         if (e.data.startedRecording == true) {
           console.log('Recording started, it will take', length/1000, 'seconds')
+          record_start = Date.now()
           page.evaluate(time_ms => {
             setTimeout(() => window.recorder.stopRecording(), time_ms);
           }, length);
         }
 
         if (e.data.stoppedRecording == true) {
-          console.log('Recording finished')
+          console.log('Recording finished, it took', Date.now() - record_start, 'ms')
           resolve(e.data.file)
         }
       });
