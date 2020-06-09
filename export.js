@@ -69,7 +69,7 @@ async function main() {
           record_start = Date.now()
           page.evaluate(time_ms => {
             setTimeout(() => window.recorder.stopRecording(), time_ms);
-          }, length);
+          }, length + 100);
         }
 
         if (e.data.stoppedRecording == true) {
