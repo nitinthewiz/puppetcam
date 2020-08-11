@@ -33,6 +33,8 @@ RUN apt-get install -yyq libappindicator1 libasound2 libatk1.0-0 libc6 libcairo2
 RUN apt-get install -yyq gconf-service lsb-release wget xdg-utils
 # and fonts
 RUN apt-get install -yyq fonts-liberation
+# and flag emoji fonts
+RUN apt-get install -yyq fonts-noto-color-emoji
 
 
 RUN apt-get install --yes curl

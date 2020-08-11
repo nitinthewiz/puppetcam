@@ -7,6 +7,8 @@ const xvfb = new Xvfb({silent: false});
 const chromeExtensionPath = `${__dirname}/chrome-extension`;
 const chromeDownloadPath = `${process.env.HOME}/Downloads`;
 
+VIEWPORT = { width: 1920, height: 1080, deviceScaleFactor: 2 };
+
 const options = {
   headless: false,
   devtools: false,
@@ -17,6 +19,8 @@ const options = {
     '--load-extension=' + chromeExtensionPath,
     '--disable-extensions-except=' + chromeExtensionPath,
     '--disable-infobars',
+    '--device-scale-factor=2',
+    '--hide-scrollbars',
     `--window-size=${1920},${1080}`,
     `--no-sandbox`,
   ],
@@ -37,8 +41,14 @@ async function record(url, time) {
   page.on('console', msg => console.log('PAGE LOG:', msg.text()));
 
   await page._client.send('Emulation.clearDeviceMetricsOverride');
-  await page.goto(url, {waitUntil: 'networkidle2'});
+  await page.setViewport(VIEWPORT);
+
+  await page.goto(url, {waitUntil: ['load', 'domcontentloaded', 'networkidle0', 'networkidle2']});
   await page.setBypassCSP(true);
+
+  console.log("Waiting for html.recordingStarted");
+  await page.waitForSelector('html.recordingStarted', {timeout: 0});
+  console.log("Finished Waiting for html.recordingStarted");
 
   // Perform any actions that have to be captured in the exported video
   await page.waitFor(parseInt(time, 10));
@@ -57,6 +67,7 @@ async function record(url, time) {
   await ffmpegExecutor.process({
     inputVideo: `${chromeDownloadPath}/${exportName}`,
     outputVideo: `./videos/${fileName}.mp4`,
+    timeCut: time/1000,
   });
   xvfb.stopSync();
 

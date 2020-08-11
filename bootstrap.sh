@@ -15,7 +15,11 @@ launch_xvfb() {
     # Set defaults if the user did not specify envs.
     export DISPLAY=${XVFB_DISPLAY:-:1}
     local screen=${XVFB_SCREEN:-0}
-    local resolution=${XVFB_RESOLUTION:-1280x1024x24}
+    # local resolution=${XVFB_RESOLUTION:-1280x1024x24}
+    # local resolution=${XVFB_RESOLUTION:-1920x1080x24}
+    # https://stackoverflow.com/questions/43637429/xvfb-xvfb-run-incorrect-resolution#comment74345245_43637429
+    local resolution=${XVFB_RESOLUTION:-2920x2580x24}
+    # local resolution=${XVFB_RESOLUTION:-1921x1125x24}
     local timeout=${XVFB_TIMEOUT:-5}
 
     # Start and wait for either Xvfb to be fully up or we hit the timeout.

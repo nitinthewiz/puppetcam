@@ -4,8 +4,9 @@ module.exports = {
     process: process
 };
 
-function process({ inputVideo, outputVideo }) {
+function process({ inputVideo, outputVideo, timeCut }) {
     let ffmpegArguments = [
+        // '-ss', '0', '-t', `${timeCut}`, // https://trac.ffmpeg.org/wiki/Seeking Faster seek
         '-i', `${inputVideo}`,
         '-crf', '1', // https://blog.addpipe.com/converting-webm-to-mp4-with-ffmpeg/
         `${outputVideo}`,
