@@ -1,5 +1,5 @@
 const fs = require('fs');
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-core');
 const Xvfb = require('xvfb');
 
 var xvfb = null;
@@ -29,6 +29,8 @@ async function main() {
     });
 
     var options = {
+//      executablePath: '/usr/bin/chromium',
+      executablePath: '/usr/bin/google-chrome',
       headless: false,
       args: [
         '--enable-usermedia-screen-capturing',
