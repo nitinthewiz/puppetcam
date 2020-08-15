@@ -29,7 +29,6 @@ async function main() {
     });
 
     var options = {
-//      executablePath: '/usr/bin/chromium',
       executablePath: '/usr/bin/google-chrome',
       headless: false,
       args: [
