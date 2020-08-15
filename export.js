@@ -45,6 +45,9 @@ async function main() {
         '--disable-gpu',
         '--no-default-browser-check',
       ],
+      ignoreDefaultArgs: [
+        '--mute-audio',
+      ],
       ignoreHTTPSErrors: true,
       dumpio: false, /* change to true for chrome debugging */
     }
