@@ -33,6 +33,9 @@ async function main() {
       headless: false,
       args: [
         '--enable-usermedia-screen-capturing',
+        '--autoplay-policy=no-user-gesture-required',
+        '--disable-features=PreloadMediaEngagementData,AutoplayIgnoreWebAudio,MediaEngagementBypassAutoplayPolicies',
+        '--start-maximized',
         '--allow-http-screen-capture',
         '--whitelisted-extension-id=gbjeleomdpcpilffmhipafohhegdcjdj',
         '--load-extension=' + __dirname + '/recorder-extension',
