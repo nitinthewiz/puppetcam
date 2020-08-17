@@ -15,6 +15,13 @@ const options = {
   args: [
     '--enable-usermedia-screen-capturing',
     '--allow-http-screen-capture',
+    '--allow-file-access-from-files',
+    '--autoplay-policy=no-user-gesture-required',
+    '--disable-features=PreloadMediaEngagementData,AutoplayIgnoreWebAudio,MediaEngagementBypassAutoplayPolicies',
+    '--start-maximized',
+    '--start-fullscreen',
+    '--disable-setuid-sandbox',
+    '--disable-gpu',
     '--auto-select-desktop-capture-source=puppetcam',
     '--load-extension=' + chromeExtensionPath,
     '--disable-extensions-except=' + chromeExtensionPath,
@@ -61,13 +68,19 @@ async function record(url, time) {
   }, exportName);
 
   // Wait for download of webm to complete
+  console.log("Waiting for html.downloadComplete");
   await page.waitForSelector('html.downloadComplete', {timeout: 0});
+  console.log("Finished Waiting for html.downloadComplete");
   await browser.close();
 
+  // await ffmpegExecutor.process({
+  //   inputVideo: `${chromeDownloadPath}/${exportName}`,
+  //   outputVideo: `./videos/${fileName}.mp4`,
+  //   timeCut: time/1000,
+  // });
   await ffmpegExecutor.process({
     inputVideo: `${chromeDownloadPath}/${exportName}`,
-    outputVideo: `./videos/${fileName}.mp4`,
-    timeCut: time/1000,
+    outputVideo: `./videos/${fileName}.mp4`
   });
   xvfb.stopSync();
 

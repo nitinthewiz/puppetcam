@@ -4,7 +4,8 @@ module.exports = {
     process: process
 };
 
-function process({ inputVideo, outputVideo, timeCut }) {
+// function process({ inputVideo, outputVideo, timeCut }) {
+function process({ inputVideo, outputVideo }) {
     let ffmpegArguments = [
         // '-ss', '0', '-t', `${timeCut}`, // https://trac.ffmpeg.org/wiki/Seeking Faster seek
         '-i', `${inputVideo}`,

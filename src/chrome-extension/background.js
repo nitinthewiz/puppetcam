@@ -16,6 +16,7 @@ chrome.runtime.onConnect.addListener(port => {
         recorder.stop();
         break;
       case 'REC_CLIENT_PLAY':
+        console.log("REC_CLIENT_PLAY");
         if (recorder) {
           return;
         }
@@ -26,7 +27,12 @@ chrome.runtime.onConnect.addListener(port => {
           // Get the stream
           navigator.webkitGetUserMedia(
             {
-              audio: false,
+              // audio: false,
+              audio: {
+                mandatory: {
+                  chromeMediaSource: 'system'
+                }
+              },
               video: {
                 mandatory: {
                   chromeMediaSource: 'desktop',
