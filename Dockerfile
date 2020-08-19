@@ -22,7 +22,7 @@ RUN apt-get update \
         libxfixes3 \
         libxi6 libxrandr2 libxrender1 libxss1 libxtst6 \
         ca-certificates fonts-liberation fonts-noto-color-emoji libappindicator1 libnss3 \
-        lsb-release xdg-utils wget gosu gpg curl \
+        lsb-release xdg-utils wget gosu gpg curl dos2unix \
     && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
     && echo 'deb http://dl.google.com/linux/chrome/deb/ stable main' >> /etc/apt/sources.list.d/google.list \
     && apt update && apt install -y google-chrome-stable \
@@ -32,6 +32,9 @@ RUN mkdir -p /home/node/Downloads \
     && chown -R node:node /home/node/Downloads
 
 COPY --from=npm_install --chown=node:node /home/node/app /home/node/app
+
+RUN dos2unix /home/node/app/run.sh
+RUN chmod +x /home/node/app/run.sh
 
 WORKDIR /home/node/app
 ENTRYPOINT ["/home/node/app/run.sh"]
