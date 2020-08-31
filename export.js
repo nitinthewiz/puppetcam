@@ -91,6 +91,9 @@ async function main() {
         });
       }, "message");
 
+      console.log("Waiting for page signal...")
+      await page.waitForFunction('window.triggerRenderer == true')
+
       console.log('Starting recording...')
       await page.evaluate((width, height) => {
           window.recorder = new RecordRTC_Extension();
