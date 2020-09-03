@@ -109,8 +109,12 @@ async function main() {
       }, width, height);
 
       console.log("Waiting for stop signal from page...")
-      await page.waitForFunction('window.triggerRenderer == false', { timeout: length + 5000 })
-      console.log('Got stop signal after', Date.now() - record_start, 'ms')
+      try {
+        await page.waitForFunction('window.triggerRenderer == false', { timeout: length + 5000 })
+        console.log('Got stop signal after', Date.now() - record_start, 'ms')
+      } catch (e) {
+        console.log('Stop signal timed out after', Date.now() - record_start, 'ms')
+      }
 
       await page.evaluate(() => {
         window.recorder.stopRecording();
