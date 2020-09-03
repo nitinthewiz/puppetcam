@@ -105,7 +105,7 @@ async function main() {
       }, width, height);
 
       console.log("Waiting for stop signal from page...")
-      await page.waitForFunction('window.triggerRenderer == false', { timeout: length + 2000 })
+      await page.waitForFunction('window.triggerRenderer == false', { timeout: length + 5000 })
       await page.evaluate(() => {
         window.recorder.stopRecording();
       });
