@@ -59,6 +59,7 @@ async function main() {
     const browser = await puppeteer.launch(options)
     const pages = await browser.pages()
     const page = pages[0]
+    let command_start
     let record_start
 
     const video_data = await new Promise(async (resolve) => {
@@ -71,7 +72,7 @@ async function main() {
         }
 
         if (e.data.startedRecording == true) {
-          console.log('Recording started, it will take', length/1000, 'seconds')
+          console.log('Recording started in', Date.now() - command_start,'ms, it will take', length/1000, 'seconds')
           record_start = Date.now()
         }
 
@@ -91,9 +92,12 @@ async function main() {
         window.recorder = new RecordRTC_Extension();
       });
 
+      command_start = Date.now();
       console.log("Waiting for start signal from page...")
       await page.waitForFunction('window.triggerRenderer == true', { timeout: 120000 })
+      console.log('Preloading took', Date.now() - command_start, 'ms')
 
+      command_start = Date.now();
       console.log('Starting recording...')
       await page.evaluate((width, height) => {
           window.recorder.startRecording({
@@ -106,6 +110,8 @@ async function main() {
 
       console.log("Waiting for stop signal from page...")
       await page.waitForFunction('window.triggerRenderer == false', { timeout: length + 5000 })
+      console.log('Got stop signal after', Date.now() - record_start, 'ms')
+
       await page.evaluate(() => {
         window.recorder.stopRecording();
       });
