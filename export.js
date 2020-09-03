@@ -35,7 +35,6 @@ async function main() {
         '--enable-usermedia-screen-capturing',
         '--autoplay-policy=no-user-gesture-required',
         '--disable-features=PreloadMediaEngagementData,AutoplayIgnoreWebAudio,MediaEngagementBypassAutoplayPolicies',
-        '--start-maximized',
         '--allow-http-screen-capture',
         '--whitelisted-extension-id=gbjeleomdpcpilffmhipafohhegdcjdj',
         '--load-extension=' + __dirname + '/recorder-extension',
@@ -74,9 +73,6 @@ async function main() {
         if (e.data.startedRecording == true) {
           console.log('Recording started, it will take', length/1000, 'seconds')
           record_start = Date.now()
-          page.evaluate(time_ms => {
-            setTimeout(() => window.recorder.stopRecording(), time_ms);
-          }, length + 100);
         }
 
         if (e.data.stoppedRecording == true) {
@@ -91,12 +87,15 @@ async function main() {
         });
       }, "message");
 
-      console.log("Waiting for page signal...")
-      await page.waitForFunction('window.triggerRenderer == true')
+      await page.evaluate(() => {
+        window.recorder = new RecordRTC_Extension();
+      });
+
+      console.log("Waiting for start signal from page...")
+      await page.waitForFunction('window.triggerRenderer == true', { timeout: 120000 })
 
       console.log('Starting recording...')
       await page.evaluate((width, height) => {
-          window.recorder = new RecordRTC_Extension();
           window.recorder.startRecording({
             enableTabCaptureAPI: true,
             fixVideoSeekingIssues: true,
@@ -104,6 +103,12 @@ async function main() {
             height: height,
           });
       }, width, height);
+
+      console.log("Waiting for stop signal from page...")
+      await page.waitForFunction('window.triggerRenderer == false', { timeout: length + 2000 })
+      await page.evaluate(() => {
+        window.recorder.stopRecording();
+      });
     })
 
     console.log('Closing browser')
