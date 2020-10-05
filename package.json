@@ -3,7 +3,10 @@
   "version": "0.0.1",
   "description": "Capture all automated actions in a browser and export as a video",
   "scripts": {
-    "example": "node export.js http://tobiasahlin.com/spinkit/ spinner.webm"
+    "example": "node export.js http://tobiasahlin.com/spinkit/ spinner.webm",
+    "copy-extension": "cp -a ./chrome-extensions/screen-recording ./recorder-extension",
+    "install-manifest-key": "cp .manifest.json.key manifest.json.new && tail -n +2 ./chrome-extensions/screen-recording/manifest.json >> manifest.json.new && mv manifest.json.new ./recorder-extension/manifest.json",
+    "install-extension": "git submodule init && git submodule update && npm run copy-extension && npm run install-manifest-key"
   },
   "keywords": [
     "record",
