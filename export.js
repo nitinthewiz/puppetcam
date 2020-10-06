@@ -2,22 +2,36 @@ const fs = require('fs');
 const puppeteer = require('puppeteer-core');
 const Xvfb = require('xvfb');
 
+const argv = require('yargs')
+  .command('$0 <url>', 'Record a video from a given url', (yargs) => yargs
+    .positional('url', { describe: 'URL to record the video from', type: 'string' })
+    .option('o', {
+      alias: 'output',
+      demandOption: false,
+      default: `${process.env.HOME}/Downloads/video.webm`,
+      defaultDescription: '~/Downloads/video.webm',
+      describe: 'Output path',
+      type: 'string',
+    })
+    .option('l', { alias: 'length', demandOption: false, default: 5000, describe: 'Video length in milliseconds', type: 'number' })
+    .option('w', { alias: 'width', demandOption: false, default: 1920, describe: 'Video width', type: 'number' })
+    .option('h', { alias: 'height', demandOption: false, default: 1080, describe: 'Video height', type: 'number' })
+    .option('t', { alias: 'trigger', demandOption: false, default: false, describe: 'Use trigger from website', type: 'boolean' })
+    .option('s', { alias: 'start-timeout', demandOption: false, default: 120000, describe: 'Start trigger timeout', type: 'number' })
+    .option('e', { alias: 'end-timeout', demandOption: false, default: 5000, describe: 'End trigger timeout', type: 'number' })
+  ).argv;
+
 var xvfb = null;
 
 async function main() {
-    var url = process.argv[2]
-    var exportname = process.argv[3]
-    var length = process.argv[4] ? parseInt(process.argv[4]) : 5000
-    var width = process.argv[5] ? parseInt(process.argv[5]) : 1920
-    var height = process.argv[6] ? parseInt(process.argv[6]) : 1080
-    var width_screen = width + 1
-    var height_screen = height + 1 + 44
+    const width_screen = argv.width + 1
+    const height_screen = argv.height + 1 + 44
 
-    console.log('url: ' + url)
-    console.log('exportName: ' + exportname)
-    console.log('length: ' + length + ' ms')
+    console.log('url: ' + argv.url)
+    console.log('filename: ' + argv.output)
+    console.log('length: ' + argv.length + ' ms')
     console.log('screen resolution: ' + width_screen + 'x' + height_screen)
-    console.log('video resolution: ' + width + 'x' + height)
+    console.log('video resolution: ' + argv.width + 'x' + argv.height)
 
     xvfb = new Xvfb({
       silent: true,
@@ -64,7 +78,7 @@ async function main() {
 
     const video_data = await new Promise(async (resolve) => {
       await page._client.send('Emulation.clearDeviceMetricsOverride')
-      await page.goto(url, {waitUntil: 'networkidle2'})
+      await page.goto(argv.url, {waitUntil: 'networkidle2'})
 
       await page.exposeFunction('onMessageReceivedEvent', e => {
         if (!e.data.messageFromContentScript1234) {
@@ -72,7 +86,7 @@ async function main() {
         }
 
         if (e.data.startedRecording == true) {
-          console.log('Recording started in', Date.now() - command_start,'ms, it will take', length/1000, 'seconds')
+          console.log('Recording started in', Date.now() - command_start, 'ms, it will take', argv.length, 'ms')
           record_start = Date.now()
         }
 
@@ -94,7 +108,7 @@ async function main() {
 
       command_start = Date.now();
       console.log("Waiting for start signal from page...")
-      await page.waitForFunction('window.triggerRenderer == true', { timeout: 120000 })
+      await page.waitForFunction('window.triggerRenderer == true', { timeout: argv.startTimeout })
       console.log('Preloading took', Date.now() - command_start, 'ms')
 
       command_start = Date.now();
@@ -106,11 +120,11 @@ async function main() {
             width: width,
             height: height,
           });
-      }, width, height);
+      }, argv.width, argv.height);
 
       console.log("Waiting for stop signal from page...")
       try {
-        await page.waitForFunction('window.triggerRenderer == false', { timeout: length + 5000 })
+        await page.waitForFunction('window.triggerRenderer == false', { timeout: argv.length + argv.endTimeout })
         console.log('Got stop signal after', Date.now() - record_start, 'ms')
       } catch (e) {
         console.log('Stop signal timed out after', Date.now() - record_start, 'ms')
@@ -126,7 +140,7 @@ async function main() {
     xvfb.stopSync()
 
     fs.writeFile(
-      `${process.env.HOME}/Downloads/${exportname}`,
+      argv.output,
       video_data.replace(/^data:(.*?);base64,/, "").replace(/ /g, '+'),
       'base64',
       err => { if (err) console.log(err);},
