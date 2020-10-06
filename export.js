@@ -88,6 +88,11 @@ async function main() {
         if (e.data.startedRecording == true) {
           console.log('Recording started in', Date.now() - command_start, 'ms, it will take', argv.length, 'ms')
           record_start = Date.now()
+          if (!argv.trigger) {
+            page.evaluate(time_ms => {
+              setTimeout(() => window.recorder.stopRecording(), time_ms);
+            }, argv.length + 100);
+          }
         }
 
         if (e.data.stoppedRecording == true) {
@@ -106,10 +111,12 @@ async function main() {
         window.recorder = new RecordRTC_Extension();
       });
 
-      command_start = Date.now();
-      console.log("Waiting for start signal from page...")
-      await page.waitForFunction('window.triggerRenderer == true', { timeout: argv.startTimeout })
-      console.log('Preloading took', Date.now() - command_start, 'ms')
+      if (argv.trigger) {
+        command_start = Date.now();
+        console.log("Waiting for start signal from page...")
+        await page.waitForFunction('window.triggerRenderer == true', { timeout: argv.startTimeout })
+        console.log('Preloading took', Date.now() - command_start, 'ms')
+      }
 
       command_start = Date.now();
       console.log('Starting recording...')
@@ -122,17 +129,19 @@ async function main() {
           });
       }, argv.width, argv.height);
 
-      console.log("Waiting for stop signal from page...")
-      try {
-        await page.waitForFunction('window.triggerRenderer == false', { timeout: argv.length + argv.endTimeout })
-        console.log('Got stop signal after', Date.now() - record_start, 'ms')
-      } catch (e) {
-        console.log('Stop signal timed out after', Date.now() - record_start, 'ms')
-      }
+      if (argv.trigger) {
+        console.log("Waiting for stop signal from page...")
+        try {
+          await page.waitForFunction('window.triggerRenderer == false', { timeout: argv.length + argv.endTimeout })
+          console.log('Got stop signal after', Date.now() - record_start, 'ms')
+        } catch (e) {
+          console.log('Stop signal timed out after', Date.now() - record_start, 'ms')
+        }
 
-      await page.evaluate(() => {
-        window.recorder.stopRecording();
-      });
+        await page.evaluate(() => {
+          window.recorder.stopRecording();
+        });
+      }
     })
 
     console.log('Closing browser')
