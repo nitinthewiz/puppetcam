@@ -1,37 +1,74 @@
 # Puppetcam
 
-Example to export chrome tab as a video
+Create screencast of a website
 
+## Examples
 
-1. Exported videos are stored in Downloads folder
-2. Specify bitrate to control quality of the exported video by adjusting `videoBitsPerSecond` property in `background.js`
+### Record given length video from website
 
+```sh
+docker run -v "${PWD}/data:/home/node/Downloads" apicore/puppetcam https://tobiasahlin.com/spinkit/ -l 10000
+```
+
+The output will be a 10 second long full HD video saved as `./data/video.webm`.
+
+### Record video from website using webside-side triggering
+
+```sh
+docker run -v "${PWD}/data:/home/node/Downloads" apicore/puppetcam https://site-triggered.example/ -t -l 10000
+```
+
+The recording is started when the `window.triggerRenderer` variable on the website becomes `true` and it is stopped when the same variable becomes `false` again. This option can be used to control the recording from the website itself. In this case the `--length` parameter is only used to set a sensible timeout. The output will be a full HD video saved as `./data/video.webm`.
+
+## Command line arguments
+
+```
+export.js <url>
+
+Record a video from a given url
+
+Positionals:
+  url  URL to record the video from                                     [string]
+
+Options:
+      --help           Show help                                       [boolean]
+      --version        Show version number                             [boolean]
+  -o, --output         Output path    [string] [default: ~/Downloads/video.webm]
+  -l, --length         Video length in milliseconds     [number] [default: 5000]
+  -w, --width          Video width                      [number] [default: 1920]
+  -h, --height         Video height                     [number] [default: 1080]
+  -t, --trigger        Use trigger from website       [boolean] [default: false]
+  -s, --start-timeout  Start trigger timeout          [number] [default: 120000]
+  -e, --end-timeout    End trigger timeout              [number] [default: 5000]
+```
+
+## Running without Docker
 
 ### Dependencies
 
 1. xvfb
-2. npm modules listed in package.json
+2. chrome browser
+3. nodejs
+4. npm modules listed in package.json
+5. up-to-date git submodules
 
-### Docker
+### Preparation
 
 ```sh
-docker build -t puppetcam:standalone .
-docker run -v "${PWD}/data:/home/node/Downloads" puppetcam:standalone http://tobiasahlin.com/spinkit/ spinner.webm
+npm install
+npm run install-extension
 ```
 
 ### Usage
 
+Use the same way as the dockerized version. A few examples:
+
 ```sh
-npm install
-node export.js http://tobiasahlin.com/spinkit/ spinner.webm
+node export.js https://tobiasahlin.com/spinkit/ -l 10000 # Outputs ~/Downloads/video.webm
+node export.js https://tobiasahlin.com/spinkit/ -o spinkit.webm # Outputs ./spinkit.webm
 ```
 
+## Credits
 
-Thanks to [@cretz](https://github.com/cretz) for helping with automatic tab selection and avoiding the permission dialog
-
-#### Motivation
-
-Was looking for a method to export a video of user actions rendered using our custom player used in [uxlens](https://uxlens.com). Export has to happen on a server in an automated fashion and hence the usage of xvfb.
-
-#### Sample video
-[![Puppetcam](https://img.youtube.com/vi/f7Vdd0ExWiY/0.jpg)](https://www.youtube.com/watch?v=f7Vdd0ExWiY "Puppetcam")
+* Thanks to [@muralikg](https://github.com/muralikg) for the original puppetcam idea.
+* Thanks to [@muaz-khan](https://github.com/muaz-khan) for his [screen-recording](https://github.com/muaz-khan/Chrome-Extensions/tree/master/screen-recording) chrome extension.
