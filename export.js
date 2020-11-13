@@ -1,18 +1,10 @@
-const fs = require('fs');
 const puppeteer = require('puppeteer-core');
 const Xvfb = require('xvfb');
 
 const argv = require('yargs')
-  .command('$0 <url>', 'Record a video from a given url', (yargs) => yargs
+  .command('$0 <url>', 'Record a video from a given url and save it to the Downloads folder', (yargs) => yargs
     .positional('url', { describe: 'URL to record the video from', type: 'string' })
-    .option('o', {
-      alias: 'output',
-      demandOption: false,
-      default: `${process.env.HOME}/Downloads/video.webm`,
-      defaultDescription: '~/Downloads/video.webm',
-      describe: 'Output path',
-      type: 'string',
-    })
+    .option('o', { alias: 'output', demandOption: false, default: 'video.webm', describe: 'Output filename', type: 'string' })
     .option('l', { alias: 'length', demandOption: false, default: 5000, describe: 'Video length in milliseconds', type: 'number' })
     .option('w', { alias: 'width', demandOption: false, default: 1920, describe: 'Video width', type: 'number' })
     .option('h', { alias: 'height', demandOption: false, default: 1080, describe: 'Video height', type: 'number' })
@@ -76,7 +68,7 @@ async function main() {
     let command_start
     let record_start
 
-    const video_data = await new Promise(async (resolve) => {
+    const video_data = await new Promise(async (resolve, reject) => {
       await page._client.send('Emulation.clearDeviceMetricsOverride')
       await page.goto(argv.url, {waitUntil: 'networkidle2'})
 
@@ -97,7 +89,15 @@ async function main() {
 
         if (e.data.stoppedRecording == true) {
           console.log('Recording finished, it took', Date.now() - record_start, 'ms')
-          resolve(e.data.file)
+          resolve({
+            path: e.data.downloadPath,
+            size: e.data.downloadSize,
+          })
+        }
+
+        if (e.data.failedRecording == true) {
+          console.log('Recording failed after', Date.now() - record_start, 'ms')
+          reject()
         }
       });
 
@@ -120,14 +120,17 @@ async function main() {
 
       command_start = Date.now();
       console.log('Starting recording...')
-      await page.evaluate((width, height) => {
+      await page.evaluate((width, height, filename) => {
           window.recorder.startRecording({
             enableTabCaptureAPI: true,
             fixVideoSeekingIssues: true,
             width: width,
             height: height,
+            sendBlobInMessage: false,
+            saveFileAsDownload: true,
+            saveFileName: filename,
           });
-      }, argv.width, argv.height);
+      }, argv.width, argv.height, argv.output);
 
       if (argv.trigger) {
         console.log("Waiting for stop signal from page...")
@@ -144,16 +147,12 @@ async function main() {
       }
     })
 
+    const fileSize = video_data.size/1024/1024;
+    console.log('File saved to', video_data.path, '(size:', fileSize.toFixed(2), 'MB)')
+
     console.log('Closing browser')
     await browser.close()
     xvfb.stopSync()
-
-    fs.writeFile(
-      argv.output,
-      video_data.replace(/^data:(.*?);base64,/, "").replace(/ /g, '+'),
-      'base64',
-      err => { if (err) console.log(err);},
-    );
 }
 
 main()
