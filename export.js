@@ -4,7 +4,7 @@ const Xvfb = require('xvfb');
 const argv = require('yargs')
   .command('$0 <url>', 'Record a video from a given url and save it to the Downloads folder', (yargs) => yargs
     .positional('url', { describe: 'URL to record the video from', type: 'string' })
-    .option('o', { alias: 'output', demandOption: false, default: 'video.webm', describe: 'Output filename', type: 'string' })
+    .option('o', { alias: 'output', demandOption: false, default: 'video.mp4', describe: 'Output filename', type: 'string' })
     .option('l', { alias: 'length', demandOption: false, default: 5000, describe: 'Video length in milliseconds', type: 'number' })
     .option('w', { alias: 'width', demandOption: false, default: 1920, describe: 'Video width', type: 'number' })
     .option('h', { alias: 'height', demandOption: false, default: 1080, describe: 'Video height', type: 'number' })
@@ -129,6 +129,7 @@ async function main() {
             sendBlobInMessage: false,
             saveFileAsDownload: true,
             saveFileName: filename,
+            videoCodec: "H264",
           });
       }, argv.width, argv.height, argv.output);
 
