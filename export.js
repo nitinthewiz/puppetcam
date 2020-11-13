@@ -19,11 +19,11 @@ async function main() {
     const width_screen = argv.width + 1
     const height_screen = argv.height + 1 + 44
 
-    console.log('url: ' + argv.url)
-    console.log('filename: ' + argv.output)
-    console.log('length: ' + argv.length + ' ms')
-    console.log('screen resolution: ' + width_screen + 'x' + height_screen)
-    console.log('video resolution: ' + argv.width + 'x' + argv.height)
+    console.error('url: ' + argv.url)
+    console.error('filename: ' + argv.output)
+    console.error('length: ' + argv.length + ' ms')
+    console.error('screen resolution: ' + width_screen + 'x' + height_screen)
+    console.error('video resolution: ' + argv.width + 'x' + argv.height)
 
     xvfb = new Xvfb({
       silent: true,
@@ -60,7 +60,7 @@ async function main() {
       dumpio: false, /* change to true for chrome debugging */
     }
 
-    console.log('Launching browser')
+    console.error('Launching browser')
     xvfb.startSync()
     const browser = await puppeteer.launch(options)
     const pages = await browser.pages()
@@ -78,7 +78,7 @@ async function main() {
         }
 
         if (e.data.startedRecording == true) {
-          console.log('Recording started in', Date.now() - command_start, 'ms, it will take', argv.length, 'ms')
+          console.error('Recording started in', Date.now() - command_start, 'ms, it will take', argv.length, 'ms')
           record_start = Date.now()
           if (!argv.trigger) {
             page.evaluate(time_ms => {
@@ -88,7 +88,7 @@ async function main() {
         }
 
         if (e.data.stoppedRecording == true) {
-          console.log('Recording finished, it took', Date.now() - record_start, 'ms')
+          console.error('Recording finished, it took', Date.now() - record_start, 'ms')
           resolve({
             path: e.data.downloadPath,
             size: e.data.downloadSize,
@@ -96,7 +96,7 @@ async function main() {
         }
 
         if (e.data.failedRecording == true) {
-          console.log('Recording failed after', Date.now() - record_start, 'ms')
+          console.error('Recording failed after', Date.now() - record_start, 'ms')
           reject()
         }
       });
@@ -113,13 +113,13 @@ async function main() {
 
       if (argv.trigger) {
         command_start = Date.now();
-        console.log("Waiting for start signal from page...")
+        console.error("Waiting for start signal from page...")
         await page.waitForFunction('window.triggerRenderer == true', { timeout: argv.startTimeout })
-        console.log('Preloading took', Date.now() - command_start, 'ms')
+        console.error('Preloading took', Date.now() - command_start, 'ms')
       }
 
       command_start = Date.now();
-      console.log('Starting recording...')
+      console.error('Starting recording...')
       await page.evaluate((width, height, filename) => {
           window.recorder.startRecording({
             enableTabCaptureAPI: true,
@@ -134,12 +134,12 @@ async function main() {
       }, argv.width, argv.height, argv.output);
 
       if (argv.trigger) {
-        console.log("Waiting for stop signal from page...")
+        console.error("Waiting for stop signal from page...")
         try {
           await page.waitForFunction('window.triggerRenderer == false', { timeout: argv.length + argv.endTimeout })
-          console.log('Got stop signal after', Date.now() - record_start, 'ms')
+          console.error('Got stop signal after', Date.now() - record_start, 'ms')
         } catch (e) {
-          console.log('Stop signal timed out after', Date.now() - record_start, 'ms')
+          console.error('Stop signal timed out after', Date.now() - record_start, 'ms')
         }
 
         await page.evaluate(() => {
@@ -149,9 +149,9 @@ async function main() {
     })
 
     const fileSize = video_data.size/1024/1024;
-    console.log('File saved to', video_data.path, '(size:', fileSize.toFixed(2), 'MB)')
+    console.error('File saved to', video_data.path, '(size:', fileSize.toFixed(2), 'MB)')
 
-    console.log('Closing browser')
+    console.error('Closing browser')
     await browser.close()
     xvfb.stopSync()
 }
