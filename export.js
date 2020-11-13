@@ -148,6 +148,7 @@ async function main() {
       }
     })
 
+    console.log(JSON.stringify(video_data))
     const fileSize = video_data.size/1024/1024;
     console.error('File saved to', video_data.path, '(size:', fileSize.toFixed(2), 'MB)')
 
