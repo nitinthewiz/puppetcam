@@ -21,7 +21,8 @@ RUN apt-get update \
         libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 \
         libxfixes3 \
         libxi6 libxrandr2 libxrender1 libxss1 libxtst6 \
-        ca-certificates fonts-liberation fonts-noto-color-emoji libappindicator1 libnss3 \
+        ca-certificates libappindicator1 libnss3 \
+        fonts-liberation fonts-noto-color-emoji ttf-mscorefonts-installer \
         lsb-release xdg-utils wget gosu gpg curl dos2unix \
     && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
     && echo 'deb http://dl.google.com/linux/chrome/deb/ stable main' >> /etc/apt/sources.list.d/google.list \
