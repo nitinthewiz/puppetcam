@@ -6,6 +6,7 @@ RUN npm install
 
 COPY ./export.js ./run.sh ./.manifest.json.key /home/node/app/
 COPY ./chrome-extensions/screen-recording /home/node/app/recorder-extension
+
 RUN tail -n +2 ./recorder-extension/manifest.json >> .manifest.json.key \
     && mv .manifest.json.key ./recorder-extension/manifest.json
 
@@ -36,6 +37,10 @@ COPY --from=npm_install --chown=node:node /home/node/app /home/node/app
 
 RUN dos2unix /home/node/app/run.sh
 RUN chmod +x /home/node/app/run.sh
+
+COPY ./Montserrat /usr/share/fonts
+RUN ls -al /usr/share/fonts
+RUN fc-cache -fv
 
 WORKDIR /home/node/app
 ENTRYPOINT ["/home/node/app/run.sh"]
