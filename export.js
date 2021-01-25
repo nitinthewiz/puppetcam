@@ -47,6 +47,7 @@ async function main() {
         '--disable-setuid-sandbox',
         '--disable-gpu',
         '--no-default-browser-check',
+        '--hide-scrollbars',
       ],
       ignoreDefaultArgs: [
         '--mute-audio',
