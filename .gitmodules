@@ -1,4 +1,4 @@
 [submodule "chrome-extensions"]
 	path = chrome-extensions
 	url = https://github.com/apicore-engineering/Chrome-Extensions
-	branch = feature/tab-recording
+	branch = master
