@@ -12,6 +12,8 @@
     "screencast"
   ],
   "dependencies": {
+    "execa": "^5.0.0",
+    "ffmpeg-static": "^4.2.7",
     "puppeteer-core": "^5.2.1",
     "xvfb": "^0.3.0"
   }

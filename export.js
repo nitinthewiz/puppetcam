@@ -2,7 +2,12 @@ const fs = require('fs');
 const puppeteer = require('puppeteer-core');
 const Xvfb = require('xvfb');
 
+const path = require('path');
+const child_process = require('child_process');
+const ffmpeg = require('ffmpeg-static');
+
 var xvfb = null;
+var ffvideo;
 
 async function main() {
     var url = process.argv[2]
@@ -20,6 +25,7 @@ async function main() {
     console.log('video resolution: ' + width + 'x' + height)
 
     xvfb = new Xvfb({
+      displayNum: 101,
       silent: true,
       xvfb_args: [
         '-ac',
@@ -76,11 +82,16 @@ async function main() {
           console.log('Recording started, it will take', length/1000, 'seconds')
           record_start = Date.now()
           page.evaluate(time_ms => {
-            setTimeout(() => window.recorder.stopRecording(), time_ms);
+            setTimeout(async function() {
+              window.recorder.stopRecording();
+              // ffVideo.stdin.pause();
+              // ffVideo.kill();
+            }, time_ms);
           }, length + 100);
         }
 
         if (e.data.stoppedRecording == true) {
+          ffVideo.kill();
           console.log('Recording finished, it took', Date.now() - record_start, 'ms')
           resolve(e.data.file)
         }
@@ -93,6 +104,110 @@ async function main() {
       }, "message");
 
       console.log('Starting recording...')
+      console.log(ffmpeg)
+      // ffVideo = child_process.spawn(ffmpeg, [
+      //   '-f',
+      //   'x11grab',
+      //   '-video_size',
+      //   `${width_screen}x${height_screen}`,
+      //   '-r',
+      //   30,
+      //   '-i',
+      //   ':101.0',
+      //   '-c:v',
+      //   'libx264',
+      //   '-crf',
+      //   '0',
+      //   // '-preset',
+      //   // 'veryslow',
+      //   '-y',
+      //   '/home/node/Downloads/helloooo1.mkv',
+      // ]);
+      ffVideo = child_process.spawn( ffmpeg, [
+        '-probesize',
+        '100M',
+        '-f',
+        'x11grab',
+        '-video_size',
+        `${width_screen}x${height_screen}`,
+        '-r',
+        60,
+        '-i',
+        ':101.0',
+        // '-pix_fmt',
+        // 'yuv420p',
+        '-y',
+        '/home/node/Downloads/hello6.mpg',
+      ] );
+      // ffVideo = child_process.spawn( ffmpeg, [
+      //   '-f',
+      //   'x11grab',
+      //   '-video_size',
+      //   `${width_screen}x${height_screen}`,
+      //   '-r',
+      //   30,
+      //   '-i',
+      //   ':101.0',
+      //   '-c:v',
+      //   'libx264rgb',
+      //   '-crf',
+      //   '0',
+      //   '-y',
+      //   '/home/node/Downloads/output.mkv',
+      // ] );
+      ffVideo.stdout.on('data', (data) => {
+        console.log(`stdout:\n${data}`);
+      });
+
+      ffVideo.stderr.on('data', (data) => {
+        console.error(`stderr: ${data}`);
+      });
+
+      ffVideo.on('error', (error) => {
+        console.error(`error: ${error.message}`);
+      });
+
+      ffVideo.on('close', (code) => {
+        console.log(`child process closed with code ${code}`);
+      });
+
+      ffVideo.on('exit', (code) => {
+        console.log(`child process exited with code ${code}`);
+      });
+      // ffVideo = child_process.spawn(ffmpeg, [
+      //   '-f',
+      //   'x11grab',
+      //   '-video_size',
+      //   `${width_screen}x${height_screen}`,
+      //   '-r',
+      //   30,
+      //   '-i',
+      //   ':101.0',
+      //   '-c:v',
+      //   'ffvhuff',
+      //   '-y',
+      //   '/home/node/Downloads/helloooo.mkv',
+      // ]);
+      // ffVideo = child_process.spawn(ffmpeg, [
+      //   '-f',
+      //   'x11grab',
+      //   '-video_size',
+      //   `${width_screen}x${height_screen}`,
+      //   '-r',
+      //   30,
+      //   '-i',
+      //   ':101.0',
+      //   '-c:v',
+      //   'libx265',
+      //   '-crf',
+      //   '0',
+      //   '-tune',
+      //   'film',
+      //   '-y',
+      //   '/home/node/Downloads/'+exportname+'.mpg',
+      // ]);
+      
+      
       await page.evaluate((width, height) => {
           window.recorder = new RecordRTC_Extension();
           window.recorder.startRecording({

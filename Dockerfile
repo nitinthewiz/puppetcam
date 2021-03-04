@@ -1,10 +1,14 @@
 # Install in complete environment
+FROM jrottenberg/ffmpeg:3.3-alpine as ffmpeg_install
+# copy ffmpeg bins
+COPY / /
 FROM node:lts-buster as npm_install
 COPY ./package*.json /home/node/app/
 WORKDIR /home/node/app
 RUN npm install
 
-COPY ./export.js ./run.sh ./.manifest.json.key /home/node/app/
+# COPY ./export.js ./run.sh ./.manifest.json.key /home/node/app/
+COPY ./export2.js ./run.sh ./.manifest.json.key /home/node/app/
 COPY ./chrome-extensions/screen-recording /home/node/app/recorder-extension
 
 RUN tail -n +2 ./recorder-extension/manifest.json >> .manifest.json.key \
@@ -25,6 +29,7 @@ RUN apt-get update \
         ca-certificates libappindicator1 libnss3 \
         fonts-liberation fonts-noto-color-emoji texlive-fonts-extra \
         lsb-release xdg-utils wget gosu gpg curl dos2unix \
+        ffmpeg \
     && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
     && echo 'deb http://dl.google.com/linux/chrome/deb/ stable main' >> /etc/apt/sources.list.d/google.list \
     && apt update && apt install -y google-chrome-stable \
