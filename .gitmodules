@@ -2,3 +2,6 @@
 	path = chrome-extensions
 	url = https://github.com/apicore-engineering/Chrome-Extensions
 	branch = feature/tab-recording
+[submodule "am-chrome-extensions"]
+	path = am-chrome-extensions
+	url = https://github.com/automediaAI/Chrome-Extensions

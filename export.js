@@ -30,6 +30,7 @@ async function main() {
 
     var options = {
       executablePath: '/usr/bin/google-chrome',
+      // executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
       headless: false,
       args: [
         '--enable-usermedia-screen-capturing',
@@ -40,6 +41,8 @@ async function main() {
         '--whitelisted-extension-id=gbjeleomdpcpilffmhipafohhegdcjdj',
         '--load-extension=' + __dirname + '/recorder-extension',
         '--disable-extensions-except=' + __dirname + '/recorder-extension',
+        // '--load-extension=' + __dirname + '/am-chrome-extensions/screen-recording',
+        // '--disable-extensions-except=' + __dirname + '/am-chrome-extensions/screen-recording',
         '--start-fullscreen',
         '--disable-infobars',
         `--window-size=${width_screen},${height_screen}`,
@@ -64,8 +67,13 @@ async function main() {
     let record_start
 
     const video_data = await new Promise(async (resolve) => {
-      await page._client.send('Emulation.clearDeviceMetricsOverride')
-      await page.goto(url, {waitUntil: 'networkidle2'})
+      await page._client.send('Emulation.clearDeviceMetricsOverride');
+      console.log('waiting for toplayer');
+      // await page.goto(url, {waitUntil: 'networkidle0'})
+      await page.goto(url);
+      // id="bgContainer"
+      await page.waitForSelector('div#toplayer');
+      console.log('toplayer complete');
 
       await page.exposeFunction('onMessageReceivedEvent', e => {
         if (!e.data.messageFromContentScript1234) {
@@ -100,6 +108,8 @@ async function main() {
             fixVideoSeekingIssues: true,
             width: width,
             height: height,
+            videoCodec: 'VP9',
+            bitsPerSecond: 8000000000
           });
       }, width, height);
     })
