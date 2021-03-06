@@ -68,12 +68,12 @@ async function main() {
 
     const video_data = await new Promise(async (resolve) => {
       await page._client.send('Emulation.clearDeviceMetricsOverride');
-      console.log('waiting for toplayer');
+      console.log('waiting for __next');
       // await page.goto(url, {waitUntil: 'networkidle0'})
       await page.goto(url);
       // id="bgContainer"
-      await page.waitForSelector('div#toplayer');
-      console.log('toplayer complete');
+      await page.waitForSelector('div#__next');
+      console.log('__next complete');
 
       await page.exposeFunction('onMessageReceivedEvent', e => {
         if (!e.data.messageFromContentScript1234) {
