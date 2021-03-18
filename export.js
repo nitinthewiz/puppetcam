@@ -38,7 +38,7 @@ async function main() {
         '--disable-features=PreloadMediaEngagementData,AutoplayIgnoreWebAudio,MediaEngagementBypassAutoplayPolicies',
         '--start-maximized',
         '--allow-http-screen-capture',
-        '--whitelisted-extension-id=eomjhcckfpplejknaligcpjdjabdnakc',
+        '--whitelisted-extension-id=fkackekjflpenppkdjifmilalhigjain',
         '--load-extension=' + __dirname + '/recorder-extension',
         '--disable-extensions-except=' + __dirname + '/recorder-extension',
         // '--load-extension=' + __dirname + '/am-chrome-extensions/screen-recording',
