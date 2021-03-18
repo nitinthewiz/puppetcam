@@ -38,7 +38,7 @@ async function main() {
         '--disable-features=PreloadMediaEngagementData,AutoplayIgnoreWebAudio,MediaEngagementBypassAutoplayPolicies',
         '--start-maximized',
         '--allow-http-screen-capture',
-        '--whitelisted-extension-id=gbjeleomdpcpilffmhipafohhegdcjdj',
+        '--whitelisted-extension-id=eomjhcckfpplejknaligcpjdjabdnakc',
         '--load-extension=' + __dirname + '/recorder-extension',
         '--disable-extensions-except=' + __dirname + '/recorder-extension',
         // '--load-extension=' + __dirname + '/am-chrome-extensions/screen-recording',
@@ -68,12 +68,13 @@ async function main() {
 
     const video_data = await new Promise(async (resolve) => {
       await page._client.send('Emulation.clearDeviceMetricsOverride');
-      console.log('waiting for __next');
-      // await page.goto(url, {waitUntil: 'networkidle0'})
-      await page.goto(url);
+      // console.log('waiting for __next');
+      await page.goto(url, {waitUntil: 'domcontentloaded'})
+      // await page.goto(url);
       // id="bgContainer"
-      await page.waitForSelector('div#__next');
-      console.log('__next complete');
+      // await page.waitForSelector('div#__next');
+      await page.waitForTimeout(1000).then(() => console.log('Waited a second!'));
+      // console.log('__next complete');
 
       await page.exposeFunction('onMessageReceivedEvent', e => {
         if (!e.data.messageFromContentScript1234) {
@@ -105,11 +106,13 @@ async function main() {
           window.recorder = new RecordRTC_Extension();
           window.recorder.startRecording({
             enableTabCaptureAPI: true,
+            enableTabCaptureAPIAudioOnly: false,
             fixVideoSeekingIssues: true,
             width: width,
             height: height,
             videoCodec: 'VP9',
-            bitsPerSecond: 8000000000
+            bitsPerSecond: 8000000000,
+            videoMaxFrameRates: 60
           });
       }, width, height);
     })
