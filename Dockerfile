@@ -42,5 +42,8 @@ COPY ./Montserrat /usr/share/fonts
 RUN ls -al /usr/share/fonts
 RUN fc-cache -fv
 
+ENV TZ="America/Los_Angeles"
+RUN date
+
 WORKDIR /home/node/app
 ENTRYPOINT ["/home/node/app/run.sh"]
